@@ -282,3 +282,5 @@ klasöründe bulunur.
 * [x] Migration
 * [x] Seeder
 * [x] Composer
+
+Devam ediyorum bu kısımdan
