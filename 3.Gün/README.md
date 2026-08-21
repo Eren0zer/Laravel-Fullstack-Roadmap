@@ -1,4 +1,4 @@
-# Gün 3 — Middleware, Routing, Controller ve Blade
+# Gün 3 — Laravel Temel Yapıları
 
 ## 1. Middleware Nedir?
 
@@ -12,9 +12,7 @@ GET /admin
 
 isteği attı.
 
-Bu isteğin direkt olarak controller'a gitmesini istemeyebiliriz. İlk olarak kullanıcının giriş yapıp yapmadığını kontrol ederiz.
-
-Bu kontrol kısmını middleware üstlenebilir.
+Direkt olarak controller'a gitmesini istemeyebiliriz. İlk olarak kullanıcı giriş yapmış mı kontrol ederiz. Bu kontrol kısmını middleware üstlenebilir.
 
 ```text
 Request
@@ -26,7 +24,7 @@ Middleware
 Controller
 ```
 
-Temel olarak iki kullanım şeklini görebiliriz:
+İki tip middleware vardır:
 
 ```text
 Global Middleware
@@ -67,7 +65,7 @@ Controller
 
 ### 1.2 Route Middleware
 
-Her route'a uygulanmaz. Belirli route'lara eklenir.
+Bunlar her route'a uygulanmaz, belirli route'lara eklenir.
 
 Örneğin:
 
@@ -95,19 +93,19 @@ auth Middleware
 Route işlemi
 ```
 
-> **Önemli:** Middleware'in önemli özelliklerinden biri request'i durdurabilmesidir. Request controller'a ulaşmadan isteği kesebilir.
+> **Önemli:** Middleware'in önemli özelliklerinden biri request'i durdurabilmesidir. Controller'a ulaşmadan isteği kesebilir.
 
-Örneğin kullanıcı giriş yapmamışsa:
+Örneğin:
 
 ```text
 Request
    │
    ▼
-auth
+auth Middleware
    │
-   ├── Giriş yapılmış → Devam et
+   ├── Giriş yapılmış     → Devam et
    │
-   └── Giriş yapılmamış → İsteği durdur / yönlendir
+   └── Giriş yapılmamış   → İsteği durdur / yönlendir
 ```
 
 ---
@@ -141,7 +139,7 @@ app/
 
 ### 1.4 Birden Fazla Middleware
 
-Bir route'a birden fazla middleware eklenebilir.
+Bir route üzerinde birden fazla middleware kullanılabilir.
 
 ```php
 Route::get('/admin', [AdminController::class, 'index'])
@@ -183,8 +181,6 @@ isteği geldiğinde Laravel'e:
 
 sorusunun cevabını route ile veririz.
 
-Basit mantık:
-
 ```text
 HTTP Request
      │
@@ -207,18 +203,6 @@ Bir sayfayı veya veriyi okumak / göstermek istediğimizde kullanılır.
 Route::get('/posts', function () {
     return 'Postlar';
 });
-```
-
-Burada:
-
-```text
-GET /posts
-     │
-     ▼
-Route çalışır
-     │
-     ▼
-Postlar
 ```
 
 ---
@@ -266,7 +250,7 @@ Buradaki:
 {id}
 ```
 
-route parametresidir.
+bir route parameter'dır.
 
 Örneğin:
 
@@ -293,14 +277,6 @@ Route::delete('/posts/{id}', function ($id) {
     return "Post {$id} silindi";
 });
 ```
-
-Örneğin:
-
-```text
-DELETE /posts/5
-```
-
-isteği `id = 5` olan post üzerinde işlem yapabilir.
 
 ---
 
@@ -356,7 +332,7 @@ PostController'a git
 index() metodunu çalıştır
 ```
 
-Yani:
+Yani temel akış:
 
 ```text
 Request
@@ -371,7 +347,7 @@ Controller
 Controller Method
 ```
 
-Route **nereye gidileceğini**, Controller ise **isteğin nasıl işleneceğini** belirler.
+Route **hangi kodun çalışacağını seçer**, Controller ise **request'in nasıl işleneceğini koordine eder**.
 
 ---
 
@@ -395,7 +371,7 @@ Blade ile:
 
 Blade, bu tarz işlemleri daha okunabilir şekilde yapma imkânı verir.
 
-> **Önemli:** `{{ }}` sadece veriyi yazdırmakla kalmaz, varsayılan olarak HTML'i **escape** eder.
+> **Önemli:** `{{ }}` sadece yazdırmakla kalmaz, varsayılan olarak HTML'i escape eder.
 
 ---
 
@@ -417,30 +393,17 @@ Blade:
 @endif
 ```
 
-Yani Blade, PHP içerisinde sık kullandığımız kontrol yapılarını daha okunabilir hale getirir.
+Blade bu tarz kontrol yapılarını daha okunabilir şekilde yazmamızı sağlar.
 
 ---
 
 ## 4.2 Layout Mantığı: `@extends`, `@section`, `@yield`
 
-Blade içerisinde ortak sayfa yapıları oluşturabiliriz.
-
-Örneğin bütün sayfalarda aynı:
-
-```text
-Navbar
-Footer
-CSS
-Genel HTML yapısı
-```
-
-olabilir.
-
-Bunları her sayfada tekrar yazmak yerine bir layout oluşturabiliriz.
+Blade içerisinde ortak sayfa yapılarını tekrar tekrar yazmak yerine layout kullanabiliriz.
 
 ### `@extends`
 
-Hangi layout'u kullanacağını söyler.
+Hangi layout'u kullanacağını söyler:
 
 ```blade
 @extends('layouts.app')
@@ -450,7 +413,7 @@ Hangi layout'u kullanacağını söyler.
 
 ### `@section`
 
-Sayfanın belirli içeriğini tanımlar.
+Sayfanın belirli içeriğini tanımlar:
 
 ```blade
 @section('content')
@@ -464,23 +427,21 @@ Sayfanın belirli içeriğini tanımlar.
 
 ### `@yield`
 
-Layout içerisinde içeriğin geleceği yeri belirtir.
+Layout içerisinde içeriğin geleceği yeri belirtir:
 
 ```blade
 @yield('content')
 ```
 
-Basit olarak:
+Kısaca:
 
 ```text
 @extends → Hangi layout?
-
 @section → Bu sayfanın içeriği ne?
-
 @yield   → O içerik layout'un neresine gelecek?
 ```
 
-Akış:
+Basit akış:
 
 ```text
 layouts/app.blade.php
@@ -539,7 +500,7 @@ Kabaca:
 
 haline dönüştürülür.
 
-Yani kullanıcı ekranda:
+Yani browser:
 
 ```text
 <script>alert('hack')</script>
@@ -547,13 +508,13 @@ Yani kullanıcı ekranda:
 
 yazısını görür fakat script çalışmaz.
 
-Bu, **XSS saldırılarına karşı önemli bir korumadır.**
+Bu, **XSS'e karşı önemli bir korumadır.**
 
 ---
 
 ### `{!! $variable !!}`
 
-Bu kullanım veriyi escape etmeden, raw HTML olarak yazdırır.
+Bu kullanım veriyi escape etmeden raw HTML olarak yazdırır.
 
 ```blade
 {!! $variable !!}
@@ -565,33 +526,477 @@ Bu kullanım veriyi escape etmeden, raw HTML olarak yazdırır.
 $variable = '<strong>Merhaba</strong>';
 ```
 
-kullanılırsa browser bunu gerçekten HTML olarak yorumlayabilir:
-
-```html
-<strong>Merhaba</strong>
-```
-
-Bu yüzden kullanıcıdan gelen veya güvenmediğimiz verilerde:
+değeri Blade'e gönderilirse:
 
 ```blade
-{!! !!}
+{!! $variable !!}
 ```
 
-kullanmak tehlikeli olabilir.
+browser bunu HTML olarak yorumlar.
+
+Bu nedenle kullanıcıdan gelen veya güvenmediğimiz verilerde `{!! !!}` kullanmak tehlikeli olabilir.
 
 Kısaca:
 
-| Kullanım            | Davranış           | Güvenlik              |
-| ------------------- | ------------------ | --------------------- |
-| `{{ $variable }}`   | HTML'i escape eder | Daha güvenli          |
-| `{!! $variable !!}` | Raw HTML basar     | Dikkatli kullanılmalı |
-
-Genel olarak:
-
-```blade
-{{ $variable }}
-```
-
-kullanmak daha güvenlidir.
+| Kullanım            | Davranış                 |
+| ------------------- | ------------------------ |
+| `{{ $variable }}`   | HTML'i escape eder       |
+| `{!! $variable !!}` | Raw HTML olarak yazdırır |
 
 ---
+
+# 5. Request
+
+Request, client'ın server'a gönderdiği HTTP isteğini temsil eder.
+
+Örneğin kullanıcı bir form doldurur. Laravel bu isteği bizim rahat kullanabileceğimiz bir `Request` object haline getirir.
+
+Basit akış:
+
+```text
+Client
+   │
+   │ HTTP Request
+   ▼
+Laravel
+   │
+   ▼
+Request Object
+   │
+   ▼
+Controller
+```
+
+Örneğin:
+
+```php
+public function store(Request $request)
+{
+    //
+}
+```
+
+Buradaki:
+
+```php
+$request
+```
+
+gelen HTTP request'i temsil eder.
+
+---
+
+## 5.1 `input()` Mantığı
+
+Request içerisindeki belirli bir input değerini almak için kullanılabilir.
+
+```php
+$request->input('title');
+```
+
+Bu ifade:
+
+> Request içindeki `title` isimli input'un değerini ver.
+
+anlamına gelir.
+
+Örneğin formdan:
+
+```text
+title = Laravel
+```
+
+geldiyse:
+
+```php
+$title = $request->input('title');
+```
+
+sonucunda:
+
+```text
+$title = "Laravel"
+```
+
+olur.
+
+---
+
+## 5.2 `$request->all()`
+
+Request içerisindeki bütün input'ları alabiliriz.
+
+```php
+$data = $request->all();
+```
+
+Mesela form:
+
+```text
+title   = Laravel
+content = Request konusu
+```
+
+gönderdiyse, `$data` içerisinde bu değerler bulunur.
+
+---
+
+## 5.3 Route Parameter ile Request Input Aynı Şey Değildir
+
+Örneğin route:
+
+```php
+Route::get('/posts/{id}', ...);
+```
+
+Request:
+
+```text
+GET /posts/5
+```
+
+Buradaki:
+
+```text
+5
+```
+
+bir **route parameter**'dır.
+
+Yani:
+
+```text
+/posts/{id}
+        │
+        ▼
+        5
+```
+
+Ama şu request'te:
+
+```text
+/posts?search=laravel
+```
+
+içindeki:
+
+```text
+search=laravel
+```
+
+bir **query parameter**'dır.
+
+Kısaca:
+
+```text
+/posts/5
+       │
+       └── Route Parameter
+
+
+/posts?search=laravel
+       │
+       └── Query Parameter
+```
+
+---
+
+# 6. Validation
+
+Örnek request:
+
+```php
+public function store(Request $request)
+{
+    $title = $request->input('title');
+}
+```
+
+Kullanıcı `title` alanını boş gönderebilir, 5000 karakter gönderebilir veya beklemediğimiz türde bir veri gönderebilir.
+
+Validation bunun için vardır.
+
+Validation, gelen verinin belirlediğimiz kurallara uygun olup olmadığını kontrol eder.
+
+Örneğin yeni bir blog postu oluştururken `title` alanının:
+
+```text
+Boş olmamasını
+String olmasını
+255 karakteri geçmemesini
+```
+
+isteyebiliriz.
+
+Laravel:
+
+```php
+$request->validate([
+    'title' => ['required', 'string', 'max:255'],
+]);
+```
+
+ile bunu kontrol edebilir.
+
+Temel akış:
+
+```text
+Request
+   │
+   ▼
+Validation
+   │
+   ├── Kurallara uygun değil → Hata
+   │
+   └── Kurallara uygun       → Devam et
+```
+
+---
+
+## 6.1 En Temel Validation Kuralları
+
+### `required`
+
+Alan boş olamaz.
+
+```php
+'required'
+```
+
+---
+
+### `string`
+
+Değerin string olmasını ister.
+
+```php
+'string'
+```
+
+---
+
+### `max`
+
+Maksimum uzunluğu / değeri belirtir.
+
+```php
+'max:255'
+```
+
+---
+
+### `min`
+
+Minimum uzunluğu / değeri belirtir.
+
+```php
+'min:3'
+```
+
+---
+
+### `email`
+
+Değerin geçerli email formatında olmasını kontrol eder.
+
+```php
+'email'
+```
+
+---
+
+### `integer`
+
+Değerin integer olmasını ister.
+
+```php
+'integer'
+```
+
+---
+
+### `nullable`
+
+Alan gelmeyebilir veya `null` olabilir.
+
+```php
+'nullable'
+```
+
+Örneğin:
+
+```php
+$request->validate([
+    'title' => ['required', 'string', 'max:255'],
+    'description' => ['nullable', 'string'],
+]);
+```
+
+Burada `title` zorunluyken `description` zorunlu değildir.
+
+---
+
+# 7. Model
+
+Laravel'de Model, uygulamadaki bir veritabanı tablosunu PHP tarafında temsil eden class'tır.
+
+Örneğin:
+
+```text
+posts
+```
+
+tablosu için:
+
+```text
+app/Models/Post.php
+```
+
+modelini oluşturabiliriz.
+
+Basit ilişki:
+
+```text
+Database
+   │
+   ▼
+posts tablosu
+   │
+   ▼
+Post Model
+   │
+   ▼
+PHP Kodumuz
+```
+
+---
+
+## 7.1 Hangi Problemi Çözer?
+
+Model olmasaydı veritabanıyla çalışırken doğrudan sürekli SQL yazabilirdik.
+
+Örneğin:
+
+```sql
+SELECT * FROM posts;
+```
+
+Laravel'de Model sayesinde:
+
+```php
+Post::all();
+```
+
+yazabiliriz.
+
+Yani database'deki verilerle PHP class'ları üzerinden çalışabiliriz.
+
+---
+
+# 8. Eloquent ORM
+
+ORM, **Object Relational Mapping** demektir.
+
+Temel fikir:
+
+> Database tabloları ve satırlarıyla doğrudan sürekli SQL yazarak değil, PHP object / class yapıları üzerinden çalışmak.
+
+Laravel'in kullandığı ORM sistemi **Eloquent**'tir.
+
+Basit olarak:
+
+```text
+PHP
+ │
+ ▼
+Eloquent
+ │
+ ▼
+SQL
+ │
+ ▼
+Database
+```
+
+---
+
+## 8.1 Neden Kullanıyoruz?
+
+Eloquent olmasaydı sık sık şu tarz SQL yazabilirdik:
+
+```sql
+SELECT *
+FROM posts
+WHERE id = 5;
+```
+
+Laravel'de:
+
+```php
+$post = Post::find(5);
+```
+
+yazabiliriz.
+
+İkisi de temelde database'den ilgili postu bulmak için kullanılır.
+
+### Avantajları
+
+* Daha okunabilir PHP kodu
+* Daha az tekrar
+* İlişkilerle daha kolay çalışma
+* CRUD işlemlerinin kolaylaşması
+
+> **Önemli:** Eloquent SQL'i ortadan kaldırmaz. Arkada yine SQL sorguları çalışır.
+
+Yani:
+
+```php
+Post::find(5);
+```
+
+yazdığımızda temel mantık:
+
+```text
+Post::find(5)
+      │
+      ▼
+Eloquent
+      │
+      ▼
+SQL sorgusu oluşturulur
+      │
+      ▼
+Database
+      │
+      ▼
+Post verisi
+      │
+      ▼
+Post Object
+```
+
+şeklindedir.
+
+---
+
+## Gün 3 İlerleme
+
+* [x] Middleware
+* [x] Global Middleware
+* [x] Route Middleware
+* [x] Birden Fazla Middleware
+* [x] Routing
+* [x] HTTP Route Metotları
+* [x] CRUD ve HTTP Metotları
+* [x] Controller
+* [x] Blade
+* [x] Blade Layout Yapısı
+* [x] Blade Escape ve XSS
+* [x] Request
+* [x] Request Input
+* [x] Route ve Query Parameter
+* [x] Validation
+* [x] Temel Validation Kuralları
+* [x] Model
+* [x] Eloquent ORM
